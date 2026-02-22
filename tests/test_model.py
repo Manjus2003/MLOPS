@@ -45,7 +45,8 @@ class TestModelLoading(unittest.TestCase):
         # Load the vectorizer if it exists
         cls.vectorizer = None
         if os.path.exists('models/vectorizer.pkl'):
-            cls.vectorizer = pickle.load(open('models/vectorizer.pkl', 'rb'))
+            with open('models/vectorizer.pkl', 'rb') as f:
+                cls.vectorizer = pickle.load(f)
 
         # Load holdout test data if it exists
         cls.holdout_data = None
@@ -55,8 +56,18 @@ class TestModelLoading(unittest.TestCase):
     @staticmethod
     def get_latest_model_version(model_name, stage="Staging"):
         client = mlflow.MlflowClient()
-        latest_version = client.get_latest_versions(model_name, stages=[stage])
-        return latest_version[0].version if latest_version else None
+        # Use search_model_versions instead of deprecated get_latest_versions
+        try:
+            versions = client.search_model_versions(f"name='{model_name}'")
+            # Filter by stage and get the latest version
+            staged_versions = [v for v in versions if v.current_stage == stage]
+            if staged_versions:
+                return max(staged_versions, key=lambda v: int(v.version)).version
+            return None
+        except:
+            # Fallback to deprecated method if search fails
+            latest_version = client.get_latest_versions(model_name, stages=[stage])
+            return latest_version[0].version if latest_version else None
 
     def test_model_loaded_properly(self):
         if not self.model_available:
@@ -83,7 +94,7 @@ class TestModelLoading(unittest.TestCase):
         self.assertEqual(len(prediction.shape), 1)  # Assuming a single output column for binary classification
 
     def test_model_performance(self):
-        if not self.model_available or not self.holdout_data:
+        if not self.model_available or self.holdout_data is None:
             self.skipTest("Model or holdout data not available")
             
         # Extract features and labels from holdout test data
