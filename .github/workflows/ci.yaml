@@ -24,12 +24,24 @@ jobs:
             ${{ runner.os }}-pip-
 
       - name: install dependencies
-        run: |-
-      -   pip install -r requirements.txt
+        run: |
+          pip install -r requirements.txt
 
-      - name: run pipeline-
+      - name: Configure AWS credentials
+        run: |
+          mkdir -p ~/.aws
+          echo "[default]" > ~/.aws/credentials
+          echo "aws_access_key_id=${{ secrets.AWS_ACCESS_KEY_ID }}" >> ~/.aws/credentials
+          echo "aws_secret_access_key=${{ secrets.AWS_SECRET_ACCESS_KEY }}" >> ~/.aws/credentials
+          echo "[default]" > ~/.aws/config
+          echo "region=${{ secrets.AWS_REGION }}" >> ~/.aws/config
+
+      - name: run pipeline
         env:
           CAPSTONE_TEST: ${{ secrets.CAPSTONE_TEST }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: ${{ secrets.AWS_REGION }}
         run: |
           dvc repro
 
