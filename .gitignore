@@ -178,3 +178,5 @@ mlruns/
 # Project specific
 models/
 data/
+
+cred.txt/

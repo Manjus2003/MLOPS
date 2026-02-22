@@ -75,16 +75,16 @@ def main():
         test_size = params['data_ingestion']['test_size']
         # test_size = 0.2
         
-        # df = load_data(data_url='https://raw.githubusercontent.com/vikashishere/Datasets/refs/heads/main/data.csv')
+        df = load_data(data_url='https://raw.githubusercontent.com/vikashishere/Datasets/refs/heads/main/data.csv')
         
         # Use AWS credentials from environment or AWS CLI configuration
-        import os
-        bucket_name = "amzn-mlops-data-manju"
-        access_key = os.getenv("AWS_ACCESS_KEY_ID")  # Will use AWS CLI config if not set
-        secret_key = os.getenv("AWS_SECRET_ACCESS_KEY")  # Will use AWS CLI config if not set
+        # import os
+        # bucket_name = "amzn-mlops-data-manju"
+        # access_key = os.getenv("AWS_ACCESS_KEY_ID")  # Will use AWS CLI config if not set
+        # secret_key = os.getenv("AWS_SECRET_ACCESS_KEY")  # Will use AWS CLI config if not set
         
-        s3 = s3_connection.s3_operations(bucket_name, access_key, secret_key)
-        df = s3.fetch_file_from_s3("data.csv")
+        # s3 = s3_connection.s3_operations(bucket_name, access_key, secret_key)
+        # df = s3.fetch_file_from_s3("data.csv")
 
 
 
