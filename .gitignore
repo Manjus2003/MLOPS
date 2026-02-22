@@ -172,5 +172,9 @@ cython_debug/
 cred.txt
 local_s3/
 
+# MLflow
+mlruns/
+
+# Project specific
 models/
 data/

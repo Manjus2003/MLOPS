@@ -21,9 +21,9 @@ warnings.filterwarnings("ignore")
 # os.environ["MLFLOW_DISABLE_ARTIFACTS_DOWNLOAD"] = "1"
 
 # Set MLflow Tracking URI & DAGsHub integration
-MLFLOW_TRACKING_URI = "https://dagshub.com/vikashdas770/YT-Capstone-Project.mlflow"
-dagshub.init(repo_owner="vikashdas770", repo_name="YT-Capstone-Project", mlflow=True)
+MLFLOW_TRACKING_URI = "https://dagshub.com/shettymanju2003/MLOPS.mlflow"
 mlflow.set_tracking_uri(MLFLOW_TRACKING_URI)
+dagshub.init(repo_owner="shettymanju2003", repo_name="MLOPS", mlflow=True)
 mlflow.set_experiment("LoR Hyperparameter Tuning")
 
 
@@ -125,3 +125,4 @@ def train_and_log_model(X_train, X_test, y_train, y_test, vectorizer):
 if __name__ == "__main__":
     (X_train, X_test, y_train, y_test), vectorizer = load_and_prepare_data("notebooks/data.csv")
     train_and_log_model(X_train, X_test, y_train, y_test, vectorizer)
+

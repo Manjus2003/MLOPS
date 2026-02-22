@@ -14,25 +14,25 @@ from src.logger import logging
 # Below code block is for production use
 # -------------------------------------------------------------------------------------
 # Set up DagsHub credentials for MLflow tracking
-dagshub_token = os.getenv("CAPSTONE_TEST")
-if not dagshub_token:
-    raise EnvironmentError("CAPSTONE_TEST environment variable is not set")
+# dagshub_token = os.getenv("CAPSTONE_TEST")
+# if not dagshub_token:
+#     raise EnvironmentError("CAPSTONE_TEST environment variable is not set")
 
-os.environ["MLFLOW_TRACKING_USERNAME"] = dagshub_token
-os.environ["MLFLOW_TRACKING_PASSWORD"] = dagshub_token
+# os.environ["MLFLOW_TRACKING_USERNAME"] = dagshub_token
+# os.environ["MLFLOW_TRACKING_PASSWORD"] = dagshub_token
 
-dagshub_url = "https://dagshub.com"
-repo_owner = "vikashdas770"
-repo_name = "YT-Capstone-Project"
+# dagshub_url = "https://dagshub.com"
+# repo_owner = "vikashdas770"
+# repo_name = "YT-Capstone-Project"
 
 # Set up MLflow tracking URI
-mlflow.set_tracking_uri(f'{dagshub_url}/{repo_owner}/{repo_name}.mlflow')
+#mlflow.set_tracking_uri(f'{dagshub_url}/{repo_owner}/{repo_name}.mlflow')
 # -------------------------------------------------------------------------------------
 
 # Below code block is for local use
 # -------------------------------------------------------------------------------------
-# mlflow.set_tracking_uri('https://dagshub.com/vikashdas770/YT-Capstone-Project.mlflow')
-# dagshub.init(repo_owner='vikashdas770', repo_name='YT-Capstone-Project', mlflow=True)
+mlflow.set_tracking_uri('https://dagshub.com/shettymanju2003/MLOPS.mlflow')
+dagshub.init(repo_owner='shettymanju2003', repo_name='MLOPS', mlflow=True)
 # -------------------------------------------------------------------------------------
 
 
@@ -131,18 +131,37 @@ def main():
                 for param_name, param_value in params.items():
                     mlflow.log_param(param_name, param_value)
             
-            # Log model to MLflow
-            mlflow.sklearn.log_model(clf, "model")
+            # Log model to MLflow and register it immediately in one operation
+            # This avoids sync issues with remote tracking servers like DagsHub
+            model_info = mlflow.sklearn.log_model(
+                sk_model=clf,
+                artifact_path="model",
+                registered_model_name="my_model"  # Register during logging
+            )
             
-            # Save model info
-            save_model_info(run.info.run_id, "model", 'reports/experiment_info.json')
+            logging.info(f"Model logged and registered as 'my_model'")
             
             # Log the metrics file to MLflow
             mlflow.log_artifact('reports/metrics.json')
-
+            
+            print(f"Model logged successfully with run_id: {run.info.run_id}")
+            print(f"✓ Model registered as 'my_model'")
+            
         except Exception as e:
             logging.error('Failed to complete the model evaluation process: %s', e)
             print(f"Error: {e}")
+            raise
+    
+    # After the run context exits, save model info
+    # This ensures the run is complete before registration
+    try:
+        if 'run' in locals():
+            save_model_info(run.info.run_id, "model", 'reports/experiment_info.json')
+            logging.info(f'Model info saved with run_id: {run.info.run_id}')
+    except Exception as e:
+        logging.error('Failed to save model info: %s', e)
+        print(f"Error saving model info: {e}")
+
 
 if __name__ == '__main__':
     main()

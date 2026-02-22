@@ -1,4 +1,7 @@
 [core]
     remote = myremote
+['remote "mylocal"']
+    url = ../local_s3
 ['remote "myremote"']
-    url = s3://complaints-datagrid
+    url = s3://amzn-mlops-data-manju
+    region = us-east-1
